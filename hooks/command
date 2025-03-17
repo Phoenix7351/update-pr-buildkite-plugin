@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+# To use this script:
+#
+#   1. Pass in values for:
+#     GITHUB_REPO: String (i.e. juul-test)
+#     GITHUB_COMMIT_SHA: String (i.e. 5f237eec94...)
+#     GITHUB_ACCESS_TOKEN: String (i.e. 5f237eec94...)
+#       Note that GITHUB_ACCESS_TOKEN should NOT be set during Test plan kickoff
+#       A better place to set it would be on your agent directly or managed using a "Secrets" system like AWS.
+
+#   2. Add a key hook set to "determine-success" in the BuildKite pipeline step that determines your fail/success status. I.e.:
+#     - label: Process Results
+#       key: determine-success
+#       plugins:
+#       - junit-annotate#v1.7.0:
+#           artifacts: junit.xml-*
+#           fail-build-on-error: true
+#       agents:
+#       - "results=true"
+
+TESTS_PASSED=$(buildkite-agent step get "outcome" --step "determine-success")
+echo $TESTS_PASSED
