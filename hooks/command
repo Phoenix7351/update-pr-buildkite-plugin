@@ -23,4 +23,4 @@ set -euo pipefail
 TESTS_PASSED=$(buildkite-agent step get "outcome" --step "determine-success")
 echo $TESTS_PASSED
 
-buildkite-agent artifact download "*/failures_artifacts_names.txt" .
+buildkite-agent artifact download "failures_artifacts_names.txt" .
