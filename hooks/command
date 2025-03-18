@@ -25,4 +25,9 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "*/failures_artifacts_names.txt" .
 
+while IFS="" read -r p || [ -n "$p" ]
+do
+  printf '%s\n' "$p"
+done < failures_artifacts_names.txt
+
 echo "success"
