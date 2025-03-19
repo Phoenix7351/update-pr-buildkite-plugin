@@ -27,9 +27,9 @@ buildkite-agent artifact download "failures_artifacts_names.txt" .
 
 while IFS="" read -r p || [ -n "$p" ]
 do
-  printf 'Looking for: %s\n' "$p"
+  # printf 'Looking for: %s\n' "$p"
   # buildkite-agent artifact download ""
-  echo $(buildkite-agent artifact search "$p" -format "%u\n")
+  echo $(buildkite-agent artifact search "$p" -format "%u\n\\n")
 done < failures_artifacts_names.txt
 
 echo "success"
