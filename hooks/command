@@ -25,11 +25,13 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "failures_artifacts_names.txt" .
 
+ARTIFACTS_TO_POST=""
+
 while IFS="" read -r p || [ -n "$p" ]
 do
   # printf 'Looking for: %s\n' "$p"
   # buildkite-agent artifact download ""
-  echo $(buildkite-agent artifact search "$p" -format "%u\n\\n")
+  ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "%u\n")
 done < failures_artifacts_names.txt
 
-echo "success"
+echo $ARTIFACTS_TO_POST
