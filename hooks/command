@@ -25,16 +25,18 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "failures_artifacts_names.txt" .
 
+ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures on the $BUILDKITE_PIPELINE_NAME pipeline. Relevant artifacts:\n\n"
 ARTIFACTS_TO_POST=""
 
 while IFS="" read -r p || [ -n "$p" ]
 do
   # printf 'Looking for: %s\n' "$p"
   # buildkite-agent artifact download ""
-  ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "%u\n")
+  ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "%u\n\n")
 done < failures_artifacts_names.txt
 
-echo $ARTIFACTS_TO_POST
+ARTIFACTS_TO_POST_WITH_HEADER+=$ARTIFACTS_TO_POST
+echo $ARTIFACTS_TO_POST_WITH_HEADER
 
 CONTEXT="${GITHUB_CHECKS_CONTEXT:-Ether}"
 
@@ -66,7 +68,7 @@ if [ -v GITHUB_COMMIT_SHA ]; then
 			-H "Authorization: Bearer $GITHUB_ACCESS_TOKEN" \
 			-H "X-GitHub-Api-Version: 2022-11-28" \
 			"https://api.github.com/repos/JuulLabs/$GITHUB_REPO/issues/$GITHUB_PR_NUMBER/comments" \
-			-d "{\"body\": \"$ARTIFACTS_TO_POST\"}"
+			-d "{\"body\": \"$ARTIFACTS_TO_POST_WITH_HEADER\"}"
     fi
   fi
 fi
