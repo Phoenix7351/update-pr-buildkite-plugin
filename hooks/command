@@ -34,7 +34,7 @@ do
   # printf 'Looking for: %s\n' "$p"
   # buildkite-agent artifact download ""
   ARTIFACTS_TO_POST+="Test that failed: $p\nRelevant artifacts:\n"
-  ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "%u\n\n")
+  ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "[%p](%u)\n\n")
 done < failures_artifacts_names.txt
 set -e
 
