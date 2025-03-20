@@ -25,13 +25,14 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "failures_artifacts_names.txt" .
 
-ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures on the $BUILDKITE_PIPELINE_NAME pipeline. Relevant artifacts:\n\n"
+ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures on the $BUILDKITE_PIPELINE_NAME pipeline:\n\n"
 ARTIFACTS_TO_POST=""
 
 while IFS="" read -r p || [ -n "$p" ]
 do
   # printf 'Looking for: %s\n' "$p"
   # buildkite-agent artifact download ""
+  ARTIFACTS_TO_POST+="Test that failed: $p Relevant artifacts:\n"
   ARTIFACTS_TO_POST+=$(buildkite-agent artifact search "$p" -format "%u\n\n")
 done < failures_artifacts_names.txt
 
