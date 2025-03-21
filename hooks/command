@@ -25,7 +25,7 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "failures_artifacts_names.txt" .
 
-ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures on the $GITHUB_CHECKS_CONTEXT pipeline:\n\n"
+ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures for $GITHUB_CHECKS_CONTEXT:\n\n"
 ARTIFACTS_TO_POST=""
 
 set +e
