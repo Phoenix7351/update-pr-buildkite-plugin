@@ -4,7 +4,8 @@ set -euo pipefail
 # To use this script:
 #
 #   1. Pass in values for:
-#     GITHUB_REPO: String (i.e. juul-test)
+#     GITHUB_ORG: String (i.e. my-org)
+#     GITHUB_REPO: String (i.e. my-repo)
 #     GITHUB_COMMIT_SHA: String (i.e. 5f237eec94...)
 #     GITHUB_ACCESS_TOKEN: String (i.e. 5f237eec94...)
 #       Note that GITHUB_ACCESS_TOKEN should NOT be set during Test plan kickoff
@@ -25,7 +26,9 @@ echo $TESTS_PASSED
 
 buildkite-agent artifact download "failures_artifacts_names.txt" .
 
-ARTIFACTS_TO_POST_WITH_HEADER="Ether encountered failures for $GITHUB_CHECKS_CONTEXT:\n\n"
+TEST_SYSTEM="${TEST_SYSTEM_NAME:-TestSystem}"
+
+ARTIFACTS_TO_POST_WITH_HEADER="$TEST_SYSTEM encountered failures for $GITHUB_CHECKS_CONTEXT:\n\n"
 ARTIFACTS_TO_POST=""
 
 set +e
@@ -39,18 +42,18 @@ set -e
 ARTIFACTS_TO_POST_WITH_HEADER+=$ARTIFACTS_TO_POST
 echo $ARTIFACTS_TO_POST_WITH_HEADER
 
-CONTEXT="${GITHUB_CHECKS_CONTEXT:-Ether}"
+CONTEXT="${GITHUB_CHECKS_CONTEXT:-TestContext}"
 
 if [ -v GITHUB_COMMIT_SHA ]; then
   if [ $TESTS_PASSED = "passed" ]; then
     echo "Informing Github that tests passed"
     curl -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
-         -X POST "https://api.github.com/repos/JuulLabs/$GITHUB_REPO/statuses/$GITHUB_COMMIT_SHA" \
+         -X POST "https://api.github.com/repos/$GITHUB_ORG/$GITHUB_REPO/statuses/$GITHUB_COMMIT_SHA" \
          -d "{ \"state\": \"success\", \"target_url\": \"$BUILDKITE_BUILD_URL\", \"description\": \"End-to-end tests have succeeded!\", \"context\": \"$CONTEXT\"}"
   else
     echo "Informing Github that tests failed"
     curl -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
-         -X POST "https://api.github.com/repos/JuulLabs/$GITHUB_REPO/statuses/$GITHUB_COMMIT_SHA" \
+         -X POST "https://api.github.com/repos/$GITHUB_ORG/$GITHUB_REPO/statuses/$GITHUB_COMMIT_SHA" \
          -d "{ \"state\": \"failure\", \"target_url\": \"$BUILDKITE_BUILD_URL\", \"description\": \"End-to-end tests have failed...\", \"context\": \"$CONTEXT\"}"
 
     if [ ! -z "$ARTIFACTS_TO_POST" ]; then
@@ -60,7 +63,7 @@ if [ -v GITHUB_COMMIT_SHA ]; then
 			-H "Accept: application/vnd.github+json" \
 			-H "Authorization: Bearer $GITHUB_ACCESS_TOKEN" \
 			-H "X-GitHub-Api-Version: 2022-11-28" \
-			"https://api.github.com/repos/JuulLabs/$GITHUB_REPO/issues/$GITHUB_PR_NUMBER/comments" \
+			"https://api.github.com/repos/$GITHUB_ORG/$GITHUB_REPO/issues/$GITHUB_PR_NUMBER/comments" \
 			-d "{\"body\": \"$ARTIFACTS_TO_POST_WITH_HEADER\"}"
     fi
   fi
